@@ -1,0 +1,16 @@
+[
+    {
+        "firstName": "John",
+        "lastName": "Johnson",
+        "id": "b8173d03-f47b-423d-a074-8076c9b7bba9",
+        "dateCreated": 1677410614986,
+        "restDays": [
+            "sat",
+            "sun"
+        ],
+        "restDaysIrregular": [
+            "2023-03-25"
+        ],
+        "restTime": 10
+    }
+]
