@@ -41,6 +41,7 @@ router.delete('/workDay', async function(req, res, next) {
   if (!req.body.id) {
     res.status(400).send('id of workDay is required')
   } else {
+    // NOTE: don't forget, this requires deletion of the work units relating to this day too.
     // for now just pretend to delete the work unit since we're not using a real database yet
     res.status(200).send();
   }
