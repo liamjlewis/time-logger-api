@@ -7,16 +7,22 @@ async function main() {
     const client = await MongoClient.connect('mongodb://localhost:27017');
     const db = client.db('time-logger');
 
-    // NOTE: this needs to check if the db is empty and if not either empty it or tell the user to empty it before running this process.
-
     // populate user-data
     const userDataCollection = db.collection('user-data');
+    userDataCollection.drop(function(err, isDeleted) {
+        if (err) throw err;
+        if (isDeleted) console.log("deleted existing data on user-data collection");
+    });
     const userData = fs.readFileSync('dummy-data/user-data.json', 'utf-8');
     const userDataParsed = JSON.parse(userData);  
     await userDataCollection.insertMany(userDataParsed);
 
     // populate users
     const usersCollection = db.collection('users');
+    usersCollection.drop(function(err, isDeleted) {
+        if (err) throw err;
+        if (isDeleted) console.log("deleted existing data on users collection");
+    });
     const users = fs.readFileSync('dummy-data/users.json', 'utf-8');
     const usersParsed = JSON.parse(users);  
     await usersCollection.insertMany(usersParsed);
