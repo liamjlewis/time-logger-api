@@ -5,6 +5,7 @@ let mockUsers = require('../dummy-data/user-data.json');
 
 /* GET users listing. */
 router.post('/', async function(req, res, next) {
+  console.log('do i have access to db? ', !!req.db);
   if (!req.body.id) {
     res.status(400).send('user id is required')
   } else {

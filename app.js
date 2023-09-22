@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var MongoClient = require('mongodb').MongoClient;
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -18,6 +19,12 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+// mongodb middleware
+app.use(async (req, res, next) => {
+  const client = await new MongoClient('mongodb://localhost:27017').connect();// NOTE: this needs to be an env var
+  req.db = client.db('time-logger');
+  next();
+});
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
