@@ -24,10 +24,10 @@ app.use(cookieParser());
 // mongodb middleware
 app.use(async (req, res, next) => {
   if(!!mongoClient) {
-    req.db = mongoClient;
+    req.db = mongoClient.db('time-logger'); // NOTE: this should be an env var
   } else {
     mongoClient = await new MongoClient('mongodb://localhost:27017').connect();// NOTE: this needs to be an env var
-    req.db = mongoClient.db('time-logger');
+    req.db = mongoClient.db('time-logger')
   }
   next();
 });

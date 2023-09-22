@@ -5,16 +5,20 @@ let mockUsers = require('../dummy-data/user-data.json');
 
 /* GET users listing. */
 router.post('/', async function(req, res, next) {
-  console.log('do i have access to db? ', !!req.db);
   if (!req.body.id) {
-    res.status(400).send('user id is required')
+    res.status(400).send('user id is required');
+    return;
+  }
+  if(!req.db) {
+    res.status(400).send('could not connect to database');
+    return;
+  }
+  const userDataCollection = req.db.collection('user-data');
+  const userData = await userDataCollection.findOne({ userId: req.body.id });
+  if (!!userData) {
+    res.json( userData )
   } else {
-    const userData = mockUsers.find(user => user.userId === req.body.id);
-    if (!!userData) {
-      res.json( userData )
-    } else {
-      res.status(400).send({message: 'user with the given id not found'})
-    }
+    res.status(400).send({message: 'user with the given id not found'})
   }
 });
 
