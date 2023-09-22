@@ -9,6 +9,8 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var userDataRouter = require('./routes/userData');
 
+var mongoClient;
+
 var app = express();
 
 // view engine setup
@@ -21,8 +23,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 // mongodb middleware
 app.use(async (req, res, next) => {
-  const client = await new MongoClient('mongodb://localhost:27017').connect();// NOTE: this needs to be an env var
-  req.db = client.db('time-logger');
+  if(!!mongoClient) {
+    req.db = mongoClient;
+  } else {
+    mongoClient = await new MongoClient('mongodb://localhost:27017').connect();// NOTE: this needs to be an env var
+    req.db = mongoClient.db('time-logger');
+  }
   next();
 });
 
