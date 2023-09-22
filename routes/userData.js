@@ -12,7 +12,7 @@ router.post('/', async function(req, res, next) {
     if (!!userData) {
       res.json( userData )
     } else {
-      res.status(404).send('user not found')
+      res.status(400).send({message: 'user with the given id not found'})
     }
   }
 });
