@@ -8,7 +8,7 @@ router.post('/', async function(req, res, next) {
   if (!req.body.id) {
     res.status(400).send('user id is required')
   } else {
-    const userData = mockUsers[req.body.id];
+    const userData = mockUsers.find(user => user.userId === req.body.id);
     if (!!userData) {
       res.json( userData )
     } else {
