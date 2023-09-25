@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var MongoClient = require('mongodb').MongoClient;
+var config = require('./config.json');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -24,10 +25,10 @@ app.use(cookieParser());
 // mongodb middleware
 app.use(async (req, res, next) => {
   if(!!mongoClient) {
-    req.db = mongoClient.db('time-logger'); // NOTE: this should be an env var
+    req.db = mongoClient.db(config.databaseName);
   } else {
-    mongoClient = await new MongoClient('mongodb://localhost:27017').connect();// NOTE: this needs to be an env var
-    req.db = mongoClient.db('time-logger')
+    mongoClient = await new MongoClient(config.databaseUrl).connect();
+    req.db = mongoClient.db(config.databaseName);
   }
   next();
 });
