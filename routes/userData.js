@@ -24,13 +24,31 @@ router.post('/', async function(req, res, next) {
 
 /* DELETE a user's workUnit. */
 router.delete('/workUnit', async function(req, res, next) {
-  if (!req.body.id) {
-    res.status(400).send('id of workUnit is required')
-  } else {
-    // for now just pretend to delete the work unit since we're not using a real database yet
-    res.status(200).send();
+  if (!req.body.userId) {
+    res.status(400).send('userId is required');
+    return;
   }
+  if (!req.body.workUnitId) {
+    res.status(400).send('workUnitId is required');
+    return;
+  }
+  const userDataCollection = req.db.collection('user-data');
+  const deleteResponse = await userDataCollection.updateOne({
+    userId: req.body.userId
+  }, {
+    $pull: {
+      workUnits: {
+        id: req.body.workUnitId
+      }
+    }
+  });
+  if(deleteResponse.matchedCount < 1 || deleteResponse.modifiedCount < 1) {
+    res.status(404).send('workUnitId is required');
+    return;
+  }
+  res.status(204).send();
 });
+
 /* create a workUnit. */
 router.post('/workUnit', async function(req, res, next) {
   if (!req.body.id) {
