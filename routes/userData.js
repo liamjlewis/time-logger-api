@@ -3,16 +3,16 @@ var router = express.Router();
 
 /* GET users listing. */
 router.post('/', async function(req, res, next) {
-  if (!req.body.id) {
-    res.status(400).send('user id is required');
+  if (!req.body.userId) {
+    res.status(400).send('userId is required');
     return;
   }
   if(!req.db) {
-    res.status(400).send('could not connect to database');
+    res.status(500).send('could not connect to database');
     return;
   }
   const userDataCollection = req.db.collection('user-data');
-  const userData = await userDataCollection.findOne({ userId: req.body.id });
+  const userData = await userDataCollection.findOne({ userId: req.body.userId });
   if (!!userData) {
     res.json( userData )
   } else {
@@ -49,12 +49,32 @@ router.delete('/workUnit', async function(req, res, next) {
 
 /* create a workUnit. */
 router.post('/workUnit', async function(req, res, next) {
-  if (!req.body.id) {
-    res.status(400).send('workUnit object is required in request body')
-  } else {
-    // for now just pretend to add the work unit since we're not using a real database yet
-    res.status(201).send();
+  if (!req.body.userId) {
+    res.status(400).send('userId is required');
+    return;
   }
+  if (!req.body.workUnit) {
+    // NOTE: add type checking of the workUnit here
+    res.status(400).send('workUnit is required');
+    return;
+  }
+  if(!req.db) {
+    res.status(500).send('could not connect to database');
+    return;
+  }
+  const userDataCollection = req.db.collection('user-data');
+  const addUserDataResponse = await userDataCollection.updateOne({
+    userId: req.body.userId
+  }, {
+    $push: {
+      workUnits: req.body.workUnit
+    }
+  });
+  if(addUserDataResponse.matchedCount < 1 || addUserDataResponse.modifiedCount < 1) {
+    res.status(500).send('unable to add workUnit');
+    return;
+  }
+  res.status(200).send();
 });
 
 /* DELETE a user's workDay. */

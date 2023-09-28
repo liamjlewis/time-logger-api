@@ -31,6 +31,7 @@ app.use(async (req, res, next) => {
     req.db = mongoClient.db(config.databaseName);
   }
   next();
+  // NOTE: this connection needs closing at some point
 });
 
 app.use('/', indexRouter);
