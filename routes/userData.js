@@ -117,12 +117,32 @@ router.delete('/workDay', async function(req, res, next) {
 
 /* create a workDay. */
 router.post('/workDay', async function(req, res, next) {
-  if (!req.body.id) {
-    res.status(400).send('workDay object is required in request body')
-  } else {
-    // for now just pretend to add the work unit since we're not using a real database yet
-    res.status(201).send();
+  if (!req.body.userId) {
+    res.status(400).send('userId is required');
+    return;
   }
+  if (!req.body.workDay) {
+    // NOTE: add type checking of the workDay here
+    res.status(400).send('workDay is required');
+    return;
+  }
+  if(!req.db) {
+    res.status(500).send('could not connect to database');
+    return;
+  }
+  const userDataCollection = req.db.collection('user-data');
+  const addUserDataResponse = await userDataCollection.updateOne({
+    userId: req.body.userId
+  }, {
+    $push: {
+      workDays: req.body.workDay
+    }
+  });
+  if(addUserDataResponse.matchedCount < 1 || addUserDataResponse.modifiedCount < 1) {
+    res.status(500).send('unable to add workDay');
+    return;
+  }
+  res.status(200).send();
 });
 
 module.exports = router;
