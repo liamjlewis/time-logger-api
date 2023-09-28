@@ -1,8 +1,6 @@
 var express = require('express');
 var router = express.Router();
 
-let mockUsers = require('../dummy-data/user-data.json');
-
 /* GET users listing. */
 router.post('/', async function(req, res, next) {
   if (!req.body.id) {
@@ -43,7 +41,7 @@ router.delete('/workUnit', async function(req, res, next) {
     }
   });
   if(deleteResponse.matchedCount < 1 || deleteResponse.modifiedCount < 1) {
-    res.status(404).send('workUnitId is required');
+    res.status(404).send('matching workUnit not found');
     return;
   }
   res.status(204).send();
@@ -61,14 +59,42 @@ router.post('/workUnit', async function(req, res, next) {
 
 /* DELETE a user's workDay. */
 router.delete('/workDay', async function(req, res, next) {
-  if (!req.body.id) {
-    res.status(400).send('id of workDay is required')
-  } else {
-    // NOTE: don't forget, this requires deletion of the work units relating to this day too.
-    // for now just pretend to delete the work unit since we're not using a real database yet
-    res.status(200).send();
-  }
+    if (!req.body.userId) {
+      res.status(400).send('userId is required');
+      return;
+    }
+    if (!req.body.workDayId) {
+      res.status(400).send('workDayId is required');
+      return;
+    }
+    const userDataCollection = req.db.collection('user-data');
+    const deleteResponse = await userDataCollection.updateOne({
+      userId: req.body.userId
+    }, {
+      $pull: {
+        workDays: {
+          id: req.body.workDayId
+        }
+      }
+    });
+    if(deleteResponse.matchedCount < 1 || deleteResponse.modifiedCount < 1) {
+      res.status(404).send('matching workDay not found');
+      return;
+    }
+    // delete all workUnits logged against this day
+    const deleteRelatedWorkUnitsResponse = await userDataCollection.updateMany({
+      userId: req.body.userId
+    }, {
+      $pull: {
+        workUnits: {
+          workDayId: req.body.workDayId
+        }
+      }
+    });
+    // no need to throw an error if nothing was deleted since there might not be workUnits logged against this workDay
+    res.status(204).send();
 });
+
 /* create a workDay. */
 router.post('/workDay', async function(req, res, next) {
   if (!req.body.id) {
