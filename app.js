@@ -24,11 +24,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 // mongodb middleware
 app.use(async (req, res, next) => {
-  if(!!mongoClient) {
-    req.db = mongoClient.db(config.databaseName);
-  } else {
-    mongoClient = await new MongoClient(config.databaseUrl).connect();
-    req.db = mongoClient.db(config.databaseName);
+  try{
+    if(!!mongoClient) {
+      req.db = mongoClient.db(config.databaseName);
+    } else {
+      mongoClient = await new MongoClient(config.databaseUrl).connect();
+      req.db = mongoClient.db(config.databaseName);
+    }
+  }catch(e) {
+    console.log('Error when connecting to mongodb: ', e);
   }
   next();
   // NOTE: this connection needs closing at some point
