@@ -4,8 +4,8 @@
 npm install
 ```
 ## Populate the db with dummy data
-NOTE: This requires mongodb running locally.
-WARNING: Running the following will wipe any data you already have in the database.
+> **_NOTE:_** This requires mongodb running locally.
+> **_WARNING:_** Running the following will wipe any data you already have in the database.
 ```
 npm run-script create-dummy-db
 ```
