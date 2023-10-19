@@ -1,4 +1,4 @@
-# Express API
+# Time Logger API
 ## Install
 ```
 npm install
